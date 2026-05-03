@@ -8,3 +8,6 @@ dist-ssr
 Thumbs.db
 
 .vercel
+
+# Local Netlify folder
+.netlify
