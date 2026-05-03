@@ -1,40 +1,38 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
-import { CartProvider } from './context/CartContext'
+import Layout from './components/Layout'
 import SplashScreen from './screens/SplashScreen'
-import HomeScreen from './screens/HomeScreen'
-import CatalogScreen from './screens/CatalogScreen'
-import CartScreen from './screens/CartScreen'
-import CheckoutScreen from './screens/CheckoutScreen'
-import ConfirmationScreen from './screens/ConfirmationScreen'
-import AdminScreen from './screens/AdminScreen'
+import Home from './screens/Home'
+import Catalog from './screens/Catalog'
+import Cart from './screens/Cart'
+import Checkout from './screens/Checkout'
+import Confirmation from './screens/Confirmation'
+import Admin from './screens/Admin'
 
 export default function App() {
   return (
-    <CartProvider>
-      <BrowserRouter>
-        <Toaster
-          position="top-center"
-          toastOptions={{
-            style: {
-              background: '#12122a',
-              color: '#e8e8f5',
-              border: '1px solid rgba(139,92,246,0.3)',
-              fontFamily: "'Outfit', sans-serif",
-            },
-          }}
-        />
-        <Routes>
-          <Route path="/"               element={<SplashScreen />} />
-          <Route path="/home"           element={<HomeScreen />} />
-          <Route path="/catalog"        element={<CatalogScreen />} />
-          <Route path="/cart"           element={<CartScreen />} />
-          <Route path="/checkout"       element={<CheckoutScreen />} />
-          <Route path="/confirmation/:orderNum" element={<ConfirmationScreen />} />
-          <Route path="/admin"          element={<AdminScreen />} />
-          <Route path="*"               element={<Navigate to="/home" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </CartProvider>
+    <BrowserRouter>
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          style: {
+            background: '#12122a',
+            color: '#e8e8f5',
+            border: '1px solid rgba(139,92,246,0.3)',
+            fontFamily: "'Outfit', sans-serif",
+          },
+        }}
+      />
+      <Routes>
+        <Route path="/" element={<SplashScreen />} />
+        <Route path="/home"    element={<Layout><Home /></Layout>} />
+        <Route path="/catalog" element={<Layout><Catalog /></Layout>} />
+        <Route path="/cart"    element={<Layout><Cart /></Layout>} />
+        <Route path="/checkout" element={<Layout><Checkout /></Layout>} />
+        <Route path="/confirmation/:orderId" element={<Layout><Confirmation /></Layout>} />
+        <Route path="/admin"   element={<Admin />} />
+        <Route path="*"        element={<Navigate to="/home" replace />} />
+      </Routes>
+    </BrowserRouter>
   )
 }

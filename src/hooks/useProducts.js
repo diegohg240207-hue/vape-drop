@@ -20,7 +20,7 @@ export function useProducts(filters = {}) {
       if (filters.brand)    q = q.eq('brand', filters.brand)
       if (filters.minPuffs) q = q.gte('puffs', filters.minPuffs)
       if (filters.maxPuffs) q = q.lte('puffs', filters.maxPuffs)
-      if (filters.search)   q = q.ilike('name', )
+      if (filters.search)   q = q.ilike('name', `%${filters.search}%`)
 
       const { data, error: err } = await q
       if (err) throw err

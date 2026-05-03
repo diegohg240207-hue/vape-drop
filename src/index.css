@@ -1,27 +1,55 @@
 @import "tailwindcss";
 
-/* ── VAPE DROP Design Tokens ── */
+/* ═══════════════════════════════════════════
+   VAPE DROP — Design Tokens
+═══════════════════════════════════════════ */
 :root {
-  --bg: #07070e;
+  /* Backgrounds */
+  --bg:  #07070e;
+  --bg2: #0d0d1c;
+  --bg3: #12122a;
   --surface: #0d0d1c;
-  --card: #12122a;
+  --card:    #12122a;
+
+  /* Brand */
+  --purple:   #8b5cf6;
+  --purple-l: #a78bfa;
+  --blue:     #06b6ff;
+  --grad:     linear-gradient(135deg, #8b5cf6 0%, #06b6ff 100%);
+  --grad-text:linear-gradient(135deg, #a78bfa, #38bdf8);
+
+  /* Border */
   --border: rgba(139, 92, 246, 0.18);
-  --purple: #8b5cf6;
-  --blue: #06b6ff;
-  --grad: linear-gradient(135deg, #8b5cf6 0%, #06b6ff 100%);
-  --grad-text: linear-gradient(135deg, #a78bfa, #38bdf8);
-  --text: #e8e8f5;
-  --muted: #5a5a80;
+
+  /* Text */
+  --text:       #e8e8f5;
+  --text-muted: #5a5a80;
+  --muted:      #5a5a80;
+
+  /* Status */
   --success: #10b981;
-  --danger: #f43f5e;
-  --warn: #f59e0b;
+  --danger:  #f43f5e;
+  --warn:    #f59e0b;
+
+  /* Typography */
   --font-display: 'Space Grotesk', sans-serif;
-  --font-body: 'Outfit', sans-serif;
-  --radius: 16px;
-  --speed: 0.28s;
+  --font-body:    'Outfit', sans-serif;
+
+  /* Shape */
+  --radius:    12px;
+  --radius-lg: 18px;
+
+  /* Motion */
+  --transition: 0.22s ease;
+  --speed:      0.28s;
 }
 
+/* ═══════════════════════════════════════════
+   Reset
+═══════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
 
 html, body {
   height: 100%;
@@ -29,17 +57,43 @@ html, body {
   color: var(--text);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-#root { height: 100%; }
+#root { min-height: 100%; display: flex; flex-direction: column; }
 
-::-webkit-scrollbar { width: 4px; }
+img { max-width: 100%; display: block; }
+
+a { color: inherit; }
+
+button { cursor: pointer; border: none; background: none; font-family: var(--font-body); }
+
+input, select, textarea {
+  font-family: var(--font-body);
+  font-size: 16px; /* prevents iOS zoom */
+}
+
+/* ═══════════════════════════════════════════
+   Scrollbar
+═══════════════════════════════════════════ */
+::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
-button { cursor: pointer; border: none; background: none; font-family: var(--font-body); }
-input, select, textarea { font-family: var(--font-body); }
+/* ═══════════════════════════════════════════
+   Layout helpers
+═══════════════════════════════════════════ */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
 
+/* ═══════════════════════════════════════════
+   Typography helpers
+═══════════════════════════════════════════ */
+.gradient-text,
 .grad-text {
   background: var(--grad-text);
   -webkit-background-clip: text;
@@ -47,6 +101,13 @@ input, select, textarea { font-family: var(--font-body); }
   background-clip: text;
 }
 
+/* ═══════════════════════════════════════════
+   Animations
+═══════════════════════════════════════════ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 @keyframes fadeSlideUp {
   from { opacity: 0; transform: translateY(18px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -54,6 +115,10 @@ input, select, textarea { font-family: var(--font-body); }
 @keyframes fadeSlideIn {
   from { opacity: 0; transform: translateX(20px); }
   to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 @keyframes pulse {
   0%, 100% { opacity: 1; }
@@ -65,14 +130,6 @@ input, select, textarea { font-family: var(--font-body); }
 @keyframes glow {
   0%, 100% { box-shadow: 0 0 20px rgba(139,92,246,0.3); }
   50%       { box-shadow: 0 0 40px rgba(6,182,255,0.4); }
-}
-@keyframes checkmark {
-  from { stroke-dashoffset: 50; }
-  to   { stroke-dashoffset: 0; }
-}
-@keyframes scanline {
-  0%   { top: -10%; }
-  100% { top: 110%; }
 }
 @keyframes splashFadeIn {
   from { opacity: 0; transform: scale(0.92); }
@@ -89,4 +146,107 @@ input, select, textarea { font-family: var(--font-body); }
 @keyframes ticker {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
+}
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+/* ═══════════════════════════════════════════
+   Mobile — Catalog sidebar toggle
+═══════════════════════════════════════════ */
+.catalog-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.catalog-sidebar {
+  position: sticky;
+  top: 80px;
+}
+
+@media (max-width: 768px) {
+  .catalog-layout {
+    grid-template-columns: 1fr;
+  }
+  .catalog-sidebar {
+    position: static;
+  }
+  .catalog-sidebar-inner {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  .catalog-sidebar-inner.open {
+    max-height: 600px;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Mobile — Checkout grid
+═══════════════════════════════════════════ */
+.checkout-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .checkout-grid {
+    grid-template-columns: 1fr;
+  }
+  .checkout-summary {
+    order: -1;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Mobile — Cart grid
+═══════════════════════════════════════════ */
+.cart-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .cart-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Mobile — Admin tabs
+═══════════════════════════════════════════ */
+.admin-tabs {
+  display: flex;
+  gap: .5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.admin-tabs::-webkit-scrollbar { display: none; }
+
+/* ═══════════════════════════════════════════
+   Mobile — Navbar
+═══════════════════════════════════════════ */
+.nav-links { display: flex; gap: .25rem; flex: 1; }
+
+@media (max-width: 600px) {
+  .nav-links { display: none; }
+}
+
+/* ═══════════════════════════════════════════
+   Touch targets — minimum 44px
+═══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  button, [role="button"] {
+    min-height: 44px;
+  }
 }
