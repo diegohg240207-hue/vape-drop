@@ -258,3 +258,31 @@ input, select, textarea {
     min-height: 44px;
   }
 }
+
+/* ═══════════════════════════════════════════
+   Bottom Nav — mobile only
+═══════════════════════════════════════════ */
+.bottom-nav-wrapper {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .bottom-nav-wrapper {
+    display: block;
+  }
+  /* Push page content above the fixed bottom nav (64px) */
+  .page-main {
+    padding-bottom: 72px;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Mobile — Hero section padding
+═══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .hero-section {
+    padding-top: 2.5rem !important;
+    padding-bottom: 2.5rem !important;
+    min-height: auto !important;
+  }
+}

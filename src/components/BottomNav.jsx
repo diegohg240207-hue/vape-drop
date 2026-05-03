@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom'
-import { useCart } from '../context/CartContext'
+import { useCart } from '../hooks/useCart'
 
 const items = [
   {
@@ -23,7 +23,7 @@ const items = [
 export default function BottomNav() {
   const navigate = useNavigate()
   const { pathname } = useLocation()
-  const { cartCount } = useCart()
+  const { count } = useCart()
 
   return (
     <nav style={{
@@ -46,13 +46,13 @@ export default function BottomNav() {
           >
             {item.icon}
             <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.5 }}>{item.label}</span>
-            {item.path === '/cart' && cartCount > 0 && (
+            {item.path === '/cart' && count > 0 && (
               <span style={{
                 position: 'absolute', top: -2, right: 'calc(50% - 18px)',
                 background: 'var(--grad)', color: 'white', borderRadius: 10,
                 fontSize: 9, fontWeight: 700, padding: '1px 5px', minWidth: 16, textAlign: 'center',
                 boxShadow: '0 0 8px rgba(139,92,246,0.6)',
-              }}>{cartCount}</span>
+              }}>{count}</span>
             )}
           </button>
         )
