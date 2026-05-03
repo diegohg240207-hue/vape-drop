@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+/* ── VAPE DROP Design Tokens ── */
+:root {
+  --bg: #07070e;
+  --surface: #0d0d1c;
+  --card: #12122a;
+  --border: rgba(139, 92, 246, 0.18);
+  --purple: #8b5cf6;
+  --blue: #06b6ff;
+  --grad: linear-gradient(135deg, #8b5cf6 0%, #06b6ff 100%);
+  --grad-text: linear-gradient(135deg, #a78bfa, #38bdf8);
+  --text: #e8e8f5;
+  --muted: #5a5a80;
+  --success: #10b981;
+  --danger: #f43f5e;
+  --warn: #f59e0b;
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+  --radius: 16px;
+  --speed: 0.28s;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root { height: 100%; }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+button { cursor: pointer; border: none; background: none; font-family: var(--font-body); }
+input, select, textarea { font-family: var(--font-body); }
+
+.grad-text {
+  background: var(--grad-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(139,92,246,0.3); }
+  50%       { box-shadow: 0 0 40px rgba(6,182,255,0.4); }
+}
+@keyframes checkmark {
+  from { stroke-dashoffset: 50; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes scanline {
+  0%   { top: -10%; }
+  100% { top: 110%; }
+}
+@keyframes splashFadeIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes loadBar {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
