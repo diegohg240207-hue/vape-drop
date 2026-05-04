@@ -10,7 +10,9 @@ const card = { background: 'var(--card)', border: '1px solid var(--border)', bor
 const sLabel = { fontSize: 11, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 10 }
 
 export default function Checkout() {
-  const { items, total: subtotal, count, clearCart } = useCart()
+  const { items, clearCart } = useCart()
+  const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0)
+  const count = items.reduce((sum, i) => sum + i.qty, 0)
   const { createOrder, loading } = useOrders()
   const { dropPoints } = useDropPoints()
   const { settings } = useSettings()

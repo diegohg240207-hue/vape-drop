@@ -23,7 +23,8 @@ const items = [
 export default function BottomNav() {
   const navigate = useNavigate()
   const { pathname } = useLocation()
-  const { count } = useCart()
+  const { items: cartItems } = useCart()
+  const count = cartItems.reduce((sum, i) => sum + i.qty, 0)
 
   return (
     <nav style={{

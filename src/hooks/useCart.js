@@ -41,13 +41,6 @@ export const useCart = create(
         set({ items: [], isOpen: false })
       },
 
-      get total() {
-        return get().items.reduce((sum, i) => sum + i.price * i.qty, 0)
-      },
-
-      get count() {
-        return get().items.reduce((sum, i) => sum + i.qty, 0)
-      },
     }),
     { name: 'vape-drop-cart' }
   )

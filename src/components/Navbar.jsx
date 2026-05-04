@@ -2,7 +2,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'
 
 export default function Navbar() {
-  const { count, toggleCart } = useCart()
+  const { items, toggleCart } = useCart()
+  const count = items.reduce((sum, i) => sum + i.qty, 0)
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const isHome = pathname === '/home' || pathname === '/'

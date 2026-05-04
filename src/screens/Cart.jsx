@@ -2,7 +2,9 @@ import { useNavigate } from 'react-router-dom'
 import { useCart } from '../hooks/useCart'
 
 export default function Cart() {
-  const { items, total, count, removeItem, changeQty, clearCart } = useCart()
+  const { items, removeItem, changeQty, clearCart } = useCart()
+  const total = items.reduce((sum, i) => sum + i.price * i.qty, 0)
+  const count = items.reduce((sum, i) => sum + i.qty, 0)
   const navigate = useNavigate()
 
   if (items.length === 0) {

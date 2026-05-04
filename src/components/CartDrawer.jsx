@@ -3,7 +3,9 @@ import { useCart } from '../hooks/useCart'
 import Button from './ui/Button'
 
 export default function CartDrawer() {
-  const { items, isOpen, closeCart, removeItem, changeQty, total, count } = useCart()
+  const { items, isOpen, closeCart, removeItem, changeQty } = useCart()
+  const total = items.reduce((sum, i) => sum + i.price * i.qty, 0)
+  const count = items.reduce((sum, i) => sum + i.qty, 0)
   const navigate = useNavigate()
 
   const drawerWidth = typeof window !== 'undefined' ? Math.min(420, window.innerWidth) : 420
