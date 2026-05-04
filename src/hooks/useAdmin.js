@@ -45,13 +45,26 @@ export function useAdminOrders() {
     setLoading(true)
     const { data } = await supabase
       .from('orders')
-      .select()
+      .select('*, order_items(quantity, unit_price, products(name))')
       .order('created_at', { ascending: false })
     setOrders(data ?? [])
     setLoading(false)
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    load()
+
+    const channel = supabase
+      .channel('admin-orders')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'orders' },
+        () => { load() }
+      )
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [])
 
   const updateStatus = async (id, status) => {
     await supabase.from('orders').update({ status }).eq('id', id)

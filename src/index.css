@@ -1,288 +1,90 @@
 @import "tailwindcss";
 
-/* ═══════════════════════════════════════════
-   VAPE DROP — Design Tokens
-═══════════════════════════════════════════ */
 :root {
-  /* Backgrounds */
-  --bg:  #07070e;
+  --bg: #07070e;
+  --surface: #0d0d1c;
+  --card: #12122a;
   --bg2: #0d0d1c;
   --bg3: #12122a;
-  --surface: #0d0d1c;
-  --card:    #12122a;
-
-  /* Brand */
-  --purple:   #8b5cf6;
+  --border: rgba(139,92,246,0.18);
+  --purple: #8b5cf6;
   --purple-l: #a78bfa;
-  --blue:     #06b6ff;
-  --grad:     linear-gradient(135deg, #8b5cf6 0%, #06b6ff 100%);
-  --grad-text:linear-gradient(135deg, #a78bfa, #38bdf8);
-
-  /* Border */
-  --border: rgba(139, 92, 246, 0.18);
-
-  /* Text */
-  --text:       #e8e8f5;
+  --blue: #06b6ff;
+  --grad: linear-gradient(135deg,#8b5cf6 0%,#06b6ff 100%);
+  --grad-text: linear-gradient(135deg,#a78bfa,#38bdf8);
+  --text: #e8e8f5;
+  --muted: #5a5a80;
   --text-muted: #5a5a80;
-  --muted:      #5a5a80;
-
-  /* Status */
   --success: #10b981;
-  --danger:  #f43f5e;
-  --warn:    #f59e0b;
-
-  /* Typography */
+  --danger: #f43f5e;
+  --warn: #f59e0b;
   --font-display: 'Space Grotesk', sans-serif;
-  --font-body:    'Outfit', sans-serif;
-
-  /* Shape */
-  --radius:    12px;
-  --radius-lg: 18px;
-
-  /* Motion */
-  --transition: 0.22s ease;
-  --speed:      0.28s;
+  --font-body: 'Outfit', sans-serif;
+  --radius: 16px;
+  --radius-lg: 16px;
+  --transition: 0.28s ease;
+  --speed: 0.28s;
 }
 
-/* ═══════════════════════════════════════════
-   Reset
-═══════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 html { scroll-behavior: smooth; }
-
 html, body {
   height: 100%;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
-
 #root { min-height: 100%; display: flex; flex-direction: column; }
-
 img { max-width: 100%; display: block; }
-
 a { color: inherit; }
-
 button { cursor: pointer; border: none; background: none; font-family: var(--font-body); }
-
 input, select, textarea {
   font-family: var(--font-body);
   font-size: 16px; /* prevents iOS zoom */
 }
 
-/* ═══════════════════════════════════════════
-   Scrollbar
-═══════════════════════════════════════════ */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
-/* ═══════════════════════════════════════════
-   Layout helpers
-═══════════════════════════════════════════ */
-.container {
-  width: 100%;
-  max-width: 1200px;
+.app-wrapper {
+  max-width: 480px;
   margin: 0 auto;
-  padding: 0 1.25rem;
+  min-height: 100%;
+  position: relative;
 }
 
-/* ═══════════════════════════════════════════
-   Typography helpers
-═══════════════════════════════════════════ */
-.gradient-text,
-.grad-text {
+.gradient-text, .grad-text {
   background: var(--grad-text);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* ═══════════════════════════════════════════
-   Animations
-═══════════════════════════════════════════ */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeSlideUp {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateX(20px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.5; }
-}
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-@keyframes glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(139,92,246,0.3); }
-  50%       { box-shadow: 0 0 40px rgba(6,182,255,0.4); }
-}
-@keyframes splashFadeIn {
-  from { opacity: 0; transform: scale(0.92); }
-  to   { opacity: 1; transform: scale(1); }
-}
-@keyframes loadBar {
-  from { width: 0%; }
-  to   { width: 100%; }
-}
-@keyframes logoFloat {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-6px); }
-}
-@keyframes ticker {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-@keyframes slideInRight {
-  from { transform: translateX(100%); }
-  to   { transform: translateX(0); }
-}
-@keyframes scanline {
-  0%   { top: -10%; }
-  100% { top: 110%; }
-}
-@keyframes checkmark {
-  from { stroke-dashoffset: 50; }
-  to   { stroke-dashoffset: 0; }
-}
+@keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeSlideUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeSlideIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+@keyframes spin { to{transform:rotate(360deg)} }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+@keyframes glow { 0%,100%{box-shadow:0 0 20px rgba(139,92,246,0.3)} 50%{box-shadow:0 0 40px rgba(6,182,255,0.4)} }
+@keyframes checkmark { from{stroke-dashoffset:50} to{stroke-dashoffset:0} }
+@keyframes scanline { 0%{top:-10%} 100%{top:110%} }
+@keyframes splashFadeIn { from{opacity:0;transform:scale(0.92)} to{opacity:1;transform:scale(1)} }
+@keyframes loadBar { from{width:0%} to{width:100%} }
+@keyframes logoFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+@keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+@keyframes slideInRight { from{transform:translateX(100%)} to{transform:translateX(0)} }
 
-/* ═══════════════════════════════════════════
-   Mobile — Catalog sidebar toggle
-═══════════════════════════════════════════ */
-.catalog-layout {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 2rem;
-  align-items: start;
-}
+.container { width:100%; max-width:480px; margin:0 auto; padding:0 20px; }
 
-.catalog-sidebar {
-  position: sticky;
-  top: 80px;
-}
+/* Page content area — accounts for header (58px + 32px ticker = 90px) and bottom nav (64px) */
+.page-content { padding-bottom: 88px; }
 
-@media (max-width: 768px) {
-  .catalog-layout {
-    grid-template-columns: 1fr;
-  }
-  .catalog-sidebar {
-    position: static;
-  }
-  .catalog-sidebar-inner {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-  }
-  .catalog-sidebar-inner.open {
-    max-height: 600px;
-  }
-}
+/* Bottom nav */
+.bottom-nav-wrapper { display: block; }
 
-/* ═══════════════════════════════════════════
-   Mobile — Checkout grid
-═══════════════════════════════════════════ */
-.checkout-grid {
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 2rem;
-  align-items: start;
-}
-
-@media (max-width: 900px) {
-  .checkout-grid {
-    grid-template-columns: 1fr;
-  }
-  .checkout-summary {
-    order: -1;
-  }
-}
-
-/* ═══════════════════════════════════════════
-   Mobile — Cart grid
-═══════════════════════════════════════════ */
-.cart-grid {
-  display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 1.5rem;
-  align-items: start;
-}
-
-@media (max-width: 860px) {
-  .cart-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* ═══════════════════════════════════════════
-   Mobile — Admin tabs
-═══════════════════════════════════════════ */
-.admin-tabs {
-  display: flex;
-  gap: .5rem;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 1.5rem;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-.admin-tabs::-webkit-scrollbar { display: none; }
-
-/* ═══════════════════════════════════════════
-   Mobile — Navbar
-═══════════════════════════════════════════ */
-.nav-links { display: flex; gap: .25rem; flex: 1; }
-
-@media (max-width: 600px) {
-  .nav-links { display: none; }
-}
-
-/* ═══════════════════════════════════════════
-   Touch targets — minimum 44px
-═══════════════════════════════════════════ */
-@media (max-width: 768px) {
-  button, [role="button"] {
-    min-height: 44px;
-  }
-}
-
-/* ═══════════════════════════════════════════
-   Bottom Nav — mobile only
-═══════════════════════════════════════════ */
-.bottom-nav-wrapper {
-  display: none;
-}
-
-@media (max-width: 768px) {
-  .bottom-nav-wrapper {
-    display: block;
-  }
-  /* Push page content above the fixed bottom nav (64px) */
-  .page-main {
-    padding-bottom: 72px;
-  }
-}
-
-/* ═══════════════════════════════════════════
-   Mobile — Hero section padding
-═══════════════════════════════════════════ */
-@media (max-width: 768px) {
-  .hero-section {
-    padding-top: 2.5rem !important;
-    padding-bottom: 2.5rem !important;
-    min-height: auto !important;
-  }
-}
+/* Touch targets */
+button, [role="button"] { min-height: 36px; }

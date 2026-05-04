@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 
-export default function Modal({ open, onClose, title, children, maxWidth = 520 }) {
+export default function Modal({ open, onClose, title, children, width, maxWidth }) {
+  const mw = width || maxWidth || 520
   useEffect(() => {
     if (!open) return
     const handler = (e) => e.key === 'Escape' && onClose()
@@ -24,7 +25,7 @@ export default function Modal({ open, onClose, title, children, maxWidth = 520 }
         style={{
           background: 'var(--bg2)', border: '1px solid var(--border)',
           borderRadius: 'var(--radius-lg)', padding: '1.75rem',
-          width: '100%', maxWidth, maxHeight: '90vh', overflowY: 'auto',
+          width: '100%', maxWidth: mw, maxHeight: '90vh', overflowY: 'auto',
           animation: 'fadeUp .2s ease both',
         }}
       >

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
 export function useOrders() {
@@ -18,13 +18,13 @@ export function useOrders() {
           customer_name:    customer.name,
           customer_email:   customer.email,
           customer_phone:   customer.phone,
-          customer_address: deliveryType === 'delivery' ? customer.address : '',
+          customer_address: customer.address || '',
+          total:            total,
+          status:           'nuevo',
           delivery_type:    deliveryType,
           payment_method:   paymentMethod,
           shipping_cost:    shippingCost,
           drop_point_id:    dropPointId || null,
-          total:            total + shippingCost,
-          status: 'pending',
         })
         .select().single()
       if (orderErr) throw orderErr
@@ -47,4 +47,27 @@ export function useOrders() {
   }
 
   return { createOrder, getOrder, loading, error }
+}
+
+export function useOrder(orderId) {
+  const [order, setOrder]     = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError]     = useState(null)
+
+  useEffect(() => {
+    if (!orderId) return
+    setLoading(true)
+    supabase
+      .from('orders')
+      .select('*, order_items(*, products(*))')
+      .eq('id', orderId)
+      .single()
+      .then(({ data, error: err }) => {
+        setOrder(data ?? null)
+        setError(err ? err.message : null)
+        setLoading(false)
+      })
+  }, [orderId])
+
+  return { order, loading, error }
 }

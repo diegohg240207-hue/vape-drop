@@ -1,15 +1,60 @@
-﻿import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
 import { useFeaturedProducts } from '../hooks/useProducts'
 import { useBundles } from '../hooks/useBundles'
 import { useCart } from '../hooks/useCart'
-import ProductCard from '../components/ProductCard'
-import Button from '../components/ui/Button'
-import Badge from '../components/ui/Badge'
+
+const s = {
+  section: { padding: '20px' },
+  cardBg: { background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 14 },
+  label: { fontSize: 10, fontWeight: 700, color: 'var(--purple)', textTransform: 'uppercase', letterSpacing: 2 },
+  title: { fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 18, marginTop: 4 },
+}
+
+function MiniCard({ product }) {
+  const { addItem } = useCart()
+  const [added, setAdded] = useState(false)
+  const handle = () => { addItem(product); setAdded(true); setTimeout(() => setAdded(false), 1400) }
+  return (
+    <div style={{ ...s.cardBg, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ aspectRatio: '1', background: 'var(--surface)', position: 'relative', overflow: 'hidden' }}>
+        {product.image_url
+          ? <img src={product.image_url} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem' }}>💨</div>
+        }
+        {product.puffs > 0 && (
+          <div style={{ position: 'absolute', top: 0, right: 0, background: 'var(--grad)', padding: '3px 6px', borderRadius: '0 14px 0 8px', fontSize: 9, fontWeight: 700, color: '#fff' }}>
+            {product.puffs.toLocaleString()}p
+          </div>
+        )}
+      </div>
+      <div style={{ padding: '10px 10px 12px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {product.brand && <span style={{ fontSize: 9, fontWeight: 600, color: 'var(--purple)', textTransform: 'uppercase', letterSpacing: 1 }}>{product.brand}</span>}
+        <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 12, lineHeight: 1.2, margin: '3px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</p>
+        {product.flavor && <span style={{ fontSize: 10, color: 'var(--muted)' }}>{product.flavor}</span>}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto', paddingTop: 8 }}>
+          <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 14, color: 'var(--blue)' }}>${product.price?.toLocaleString('es-MX')}</span>
+          <button
+            onClick={handle}
+            disabled={product.stock === 0}
+            style={{
+              width: 28, height: 28, borderRadius: 8, border: 'none', cursor: product.stock === 0 ? 'not-allowed' : 'pointer',
+              background: product.stock === 0 ? 'rgba(255,255,255,0.08)' : added ? '#10b981' : 'var(--grad)',
+              color: '#fff', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              transition: 'all 0.2s',
+            }}
+          >{product.stock === 0 ? '✕' : added ? '✓' : '+'}</button>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function Home() {
-  const { products, loading } = useFeaturedProducts(8)
+  const { products, loading } = useFeaturedProducts(4)
   const { bundles } = useBundles(false)
   const { addItem } = useCart()
+  const navigate = useNavigate()
 
   const addBundle = (bundle) => {
     bundle.bundle_items?.forEach(item => {
@@ -22,122 +67,158 @@ export default function Home() {
   return (
     <div>
       {/* Hero */}
-      <section style={{ minHeight:'calc(100dvh - 64px)', display:'flex', alignItems:'center', padding:'4rem 1.25rem', position:'relative', overflow:'hidden', background:'linear-gradient(180deg,rgba(139,92,246,.07) 0%,transparent 60%)' }}>
-        <div style={{ position:'absolute', width:600, height:600, borderRadius:'50%', background:'radial-gradient(circle,rgba(139,92,246,.12) 0%,transparent 70%)', top:'-10%', right:'-10%', filter:'blur(80px)', pointerEvents:'none' }}/>
-        <div style={{ position:'absolute', width:400, height:400, borderRadius:'50%', background:'radial-gradient(circle,rgba(6,182,255,.08) 0%,transparent 70%)', bottom:'5%', left:'-5%', filter:'blur(60px)', pointerEvents:'none' }}/>
-        <div className="container" style={{ zIndex:1 }}>
-          <div style={{ maxWidth:680, animation:'fadeUp .8s ease both' }}>
-            <div style={{ display:'inline-flex', alignItems:'center', gap:'.5rem', background:'rgba(139,92,246,.12)', border:'1px solid rgba(139,92,246,.3)', borderRadius:99, padding:'.35rem 1rem', fontSize:'12px', fontWeight:600, color:'var(--purple-l)', letterSpacing:'.06em', textTransform:'uppercase', marginBottom:'1.5rem' }}>
-              Nueva coleccion disponible
-            </div>
-            <h1 style={{ fontSize:'clamp(2.5rem,6vw,4.5rem)', fontWeight:800, lineHeight:1.05, letterSpacing:'-.03em', marginBottom:'1.25rem' }}>
-              El vape que siempre<br/><span className="gradient-text">quisiste</span>
-            </h1>
-            <p style={{ fontSize:'1.1rem', color:'var(--text-muted)', maxWidth:500, lineHeight:1.7, marginBottom:'2rem' }}>
-              La mejor seleccion de vapeadores desechables. Envio gratis en compras de 3 o mas piezas.
-            </p>
-            <div style={{ display:'flex', gap:'1rem', flexWrap:'wrap', alignItems:'center' }}>
-              <Link to="/catalog"><Button variant="primary" size="lg">Ver catalogo</Button></Link>
-              <Link to="/catalog"><Button variant="ghost" size="lg">Explorar sabores</Button></Link>
-            </div>
-            <div style={{ marginTop:'1.5rem', display:'inline-flex', alignItems:'center', gap:'.5rem', fontSize:'13px', color:'#4ade80', background:'rgba(34,197,94,.1)', border:'1px solid rgba(34,197,94,.2)', borderRadius:99, padding:'.35rem 1rem' }}>
-              🚚 Envio GRATIS comprando 3 o mas piezas
-            </div>
+      <section style={{ padding: '28px 20px 24px', position: 'relative', overflow: 'hidden', background: 'linear-gradient(160deg,#0d0d22 0%,#080812 60%)' }}>
+        <div style={{ position: 'absolute', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle,rgba(139,92,246,0.15),transparent 70%)', top: -60, right: -60, filter: 'blur(40px)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle,rgba(6,182,255,0.1),transparent 70%)', bottom: -40, left: -40, filter: 'blur(40px)', pointerEvents: 'none' }} />
+
+        <div style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
+          <img
+            src="/logo_vapedrop.png"
+            alt="VAPE DROP"
+            style={{ width: 'min(200px,55vw)', margin: '0 auto 16px', animation: 'logoFloat 4s ease-in-out infinite', filter: 'drop-shadow(0 8px 32px rgba(139,92,246,0.35)) drop-shadow(0 2px 12px rgba(6,182,255,0.25))', borderRadius: 20 }}
+            onError={e => { e.target.style.display = 'none' }}
+          />
+
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: 99, padding: '4px 12px', marginBottom: 14 }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', display: 'block', animation: 'pulse 1.5s infinite' }} />
+            <span style={{ fontSize: 10, fontWeight: 700, color: '#10b981', letterSpacing: '0.5px' }}>SERVICIO ACTIVO — ENTREGA HOY</span>
           </div>
+
+          <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(24px,7vw,30px)', lineHeight: 1.15, marginBottom: 10 }}>
+            Compra <span className="grad-text">rápido</span>, recibe <span className="grad-text">discreto</span>
+          </h1>
+          <p style={{ fontSize: 13, color: 'var(--muted)', lineHeight: 1.6, maxWidth: 300, margin: '0 auto 20px' }}>
+            Sin contacto. Sin historial. Solo tú y tu vape.
+          </p>
+
+          <button
+            onClick={() => navigate('/catalog')}
+            style={{
+              width: '100%', padding: '14px', borderRadius: 14, border: 'none',
+              background: 'var(--grad)', color: '#fff', fontFamily: 'var(--font-display)',
+              fontSize: 15, fontWeight: 700, cursor: 'pointer',
+              boxShadow: '0 6px 32px rgba(139,92,246,0.4)', transition: 'all 0.2s',
+            }}
+            onMouseEnter={e => { e.target.style.transform = 'translateY(-2px)'; e.target.style.boxShadow = '0 10px 40px rgba(139,92,246,0.5)' }}
+            onMouseLeave={e => { e.target.style.transform = 'translateY(0)'; e.target.style.boxShadow = '0 6px 32px rgba(139,92,246,0.4)' }}
+          >
+            Comprar ahora →
+          </button>
         </div>
       </section>
 
-      {/* Bundles section — only shown if bundles exist */}
-      {bundles.length > 0 && (
-        <section style={{ padding:'4rem 1.25rem', background:'linear-gradient(135deg,rgba(139,92,246,.06) 0%,rgba(6,182,255,.04) 100%)', borderTop:'1px solid var(--border)', borderBottom:'1px solid var(--border)' }}>
-          <div className="container">
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'2rem', flexWrap:'wrap', gap:'1rem' }}>
-              <div>
-                <h2 style={{ fontSize:'clamp(1.4rem,3vw,2rem)', fontWeight:800 }}>Combos y Promociones</h2>
-                <p style={{ color:'var(--text-muted)', fontSize:'14px', marginTop:'.25rem' }}>Packs con precio especial — ahorra mas comprando junto</p>
-              </div>
-            </div>
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))', gap:'1.25rem' }}>
-              {bundles.map(bundle => (
-                <div key={bundle.id} style={{ background:'var(--bg2)', border:'1px solid rgba(139,92,246,.25)', borderRadius:'var(--radius-lg)', padding:'1.5rem', display:'flex', flexDirection:'column', gap:'1rem', transition:'all var(--transition)', position:'relative', overflow:'hidden' }}
-                  onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-3px)';e.currentTarget.style.boxShadow='0 12px 35px rgba(139,92,246,.2)'}}
-                  onMouseLeave={e=>{e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='none'}}>
-                  <div style={{ position:'absolute', top:0, left:0, right:0, height:3, background:'linear-gradient(90deg,var(--purple),var(--blue))' }}/>
-                  <div>
-                    <Badge color="purple">COMBO</Badge>
-                    <h3 style={{ fontSize:'1.05rem', fontWeight:700, marginTop:'.6rem', marginBottom:'.3rem' }}>{bundle.name}</h3>
-                    {bundle.description && <p style={{ fontSize:'13px', color:'var(--text-muted)', lineHeight:1.5 }}>{bundle.description}</p>}
-                  </div>
-                  {bundle.bundle_items?.length > 0 && (
-                    <div style={{ display:'flex', flexDirection:'column', gap:'.35rem' }}>
-                      {bundle.bundle_items.map((item,i) => (
-                        <div key={i} style={{ display:'flex', gap:'.4rem', alignItems:'center', fontSize:'12px', color:'var(--text-muted)' }}>
-                          <span style={{ color:'var(--purple-l)', fontWeight:700 }}>x{item.quantity}</span>
-                          <span>{item.products?.name}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:'auto', paddingTop:'.5rem', borderTop:'1px solid var(--border)' }}>
-                    <span style={{ fontFamily:"'Space Grotesk'", fontSize:'1.35rem', fontWeight:800, background:'linear-gradient(135deg,var(--purple-l),var(--blue))', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>
-                      ${bundle.price?.toLocaleString('es-MX')}
-                    </span>
-                    <Button variant="primary" size="sm" onClick={() => addBundle(bundle)}>
-                      Agregar combo
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
+      {/* Trust strip */}
+      <section style={{ display: 'flex', background: 'var(--surface)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
+        {[
+          { icon: '⚡', t: '< 45 min', s: 'Entrega' },
+          { icon: '🔒', t: 'Anónimo', s: 'Sin registro' },
+          { icon: '🚚', t: 'Express', s: 'Sin contacto' },
+        ].map((f, i) => (
+          <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '14px 4px', borderRight: i < 2 ? '1px solid var(--border)' : 'none' }}>
+            <span style={{ fontSize: 18 }}>{f.icon}</span>
+            <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 12 }}>{f.t}</span>
+            <span style={{ fontSize: 10, color: 'var(--muted)' }}>{f.s}</span>
           </div>
-        </section>
-      )}
-
-      {/* Features strip */}
-      <section style={{ padding:'3.5rem 1.25rem', background:'var(--bg2)', borderTop:'1px solid var(--border)', borderBottom:'1px solid var(--border)' }}>
-        <div className="container">
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:'1.25rem' }}>
-            {[
-              {icon:'⚡', t:'Entrega rapida',   d:'24-48h a todo el pais'},
-              {icon:'🔋', t:'Alta duracion',    d:'Hasta 25.000 puffs'},
-              {icon:'✅', t:'Calidad premium',  d:'Marcas originales verificadas'},
-              {icon:'🚚', t:'Envio gratis',     d:'En compras de 3 o mas piezas'},
-            ].map(f=>(
-              <div key={f.t} style={{ display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center', padding:'1.25rem', background:'var(--bg3)', borderRadius:'var(--radius-lg)', border:'1px solid var(--border)' }}>
-                <span style={{ fontSize:'1.75rem', marginBottom:'.6rem' }}>{f.icon}</span>
-                <h3 style={{ fontSize:'.9rem', fontWeight:700, marginBottom:'.3rem' }}>{f.t}</h3>
-                <p style={{ fontSize:'12px', color:'var(--text-muted)' }}>{f.d}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        ))}
       </section>
 
       {/* Featured products */}
-      <section style={{ padding:'5rem 1.25rem' }}>
-        <div className="container">
-          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'2.5rem', flexWrap:'wrap', gap:'1rem' }}>
-            <div>
-              <h2 style={{ fontSize:'clamp(1.5rem,3vw,2rem)', fontWeight:800 }}>Productos destacados</h2>
-              <p style={{ color:'var(--text-muted)', fontSize:'14px', marginTop:'.25rem' }}>Los mas elegidos</p>
-            </div>
-            <Link to="/catalog"><Button variant="ghost" size="sm">Ver todos</Button></Link>
+      <section style={s.section}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+          <div>
+            <p style={s.label}>Más vendidos</p>
+            <p style={s.title}>Top Vapes 🔥</p>
           </div>
-          {loading ? (
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(230px,1fr))', gap:'1.25rem' }}>
-              {Array(4).fill(0).map((_,i)=><div key={i} style={{ height:340, background:'var(--bg2)', borderRadius:'var(--radius-lg)', border:'1px solid var(--border)', opacity:.4 }}/>)}
+          <Link to="/catalog" style={{
+            fontSize: 11, fontWeight: 700, background: 'var(--card)', border: '1px solid var(--border)',
+            borderRadius: 20, padding: '5px 12px', textDecoration: 'none', color: 'var(--text)',
+          }}>Ver todos</Link>
+        </div>
+
+        {loading ? (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            {[0,1,2,3].map(i => <div key={i} style={{ height: 220, background: 'var(--card)', borderRadius: 14, opacity: 0.4, animation: 'pulse 1.5s infinite' }} />)}
+          </div>
+        ) : products.length === 0 ? (
+          <p style={{ textAlign: 'center', padding: '2rem', color: 'var(--muted)', fontSize: 13 }}>Cargando productos...</p>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            {products.map(p => <MiniCard key={p.id} product={p} />)}
+          </div>
+        )}
+      </section>
+
+      {/* Bundles */}
+      {bundles.length > 0 && (
+        <section style={{ padding: '0 20px 20px' }}>
+          <p style={s.label}>Combos</p>
+          <p style={{ ...s.title, marginBottom: 14 }}>Packs especiales 💥</p>
+          {bundles.map(b => (
+            <BundleCard key={b.id} bundle={b} onAdd={addBundle} />
+          ))}
+        </section>
+      )}
+
+      {/* How it works */}
+      <section style={{ ...s.section, background: 'var(--surface)', borderTop: '1px solid var(--border)' }}>
+        <p style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 16, marginBottom: 16 }}>¿Cómo funciona?</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, position: 'relative' }}>
+          <div style={{ position: 'absolute', left: 17, top: 36, bottom: 36, width: 2, background: 'var(--border)', zIndex: 0 }} />
+          {[
+            { icon: '🛍️', t: 'Elige tu vape', d: 'Explora el catálogo y agrega al carrito' },
+            { icon: '💳', t: 'Paga en línea', d: 'Tarjeta, transferencia o efectivo' },
+            { icon: '📦', t: 'Recibe tu pedido', d: 'Entrega sin contacto, directo a ti' },
+          ].map((step, i) => (
+            <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'center', position: 'relative', zIndex: 1 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 12, background: 'var(--grad)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>
+                {step.icon}
+              </div>
+              <div>
+                <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 13 }}>{step.t}</p>
+                <p style={{ fontSize: 11, color: 'var(--muted)', lineHeight: 1.5, marginTop: 2 }}>{step.d}</p>
+              </div>
             </div>
-          ) : products.length === 0 ? (
-            <div style={{ textAlign:'center', padding:'4rem', color:'var(--text-muted)' }}>
-              <p>Conecta Supabase para ver productos.</p>
-            </div>
-          ) : (
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(230px,1fr))', gap:'1.25rem' }}>
-              {products.map(p=><ProductCard key={p.id} product={p}/>)}
-            </div>
-          )}
+          ))}
         </div>
       </section>
+
+      {/* Footer */}
+      <footer style={{ padding: 20, borderTop: '1px solid var(--border)', textAlign: 'center' }}>
+        <p style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 14 }} className="grad-text">VAPE DROP</p>
+        <p style={{ fontSize: 11, color: 'var(--muted)', marginTop: 4 }}>Entrega anónima · Rápida · Discreta</p>
+        <p style={{ fontSize: 10, color: 'var(--muted)', marginTop: 8, opacity: 0.6 }}>© 2026 VAPE DROP. Todos los derechos reservados.</p>
+      </footer>
+    </div>
+  )
+}
+
+function BundleCard({ bundle, onAdd }) {
+  const [added, setAdded] = useState(false)
+  const handle = () => { onAdd(bundle); setAdded(true); setTimeout(() => setAdded(false), 2000) }
+  const names = bundle.bundle_items?.map(i => i.products?.name).filter(Boolean).join(' · ') || ''
+  return (
+    <div style={{
+      background: 'linear-gradient(135deg,rgba(139,92,246,0.14) 0%,rgba(6,182,255,0.08) 100%)',
+      border: '1px solid rgba(139,92,246,0.3)', borderRadius: 14, padding: 14, marginBottom: 10,
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+        <div>
+          <p style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 14 }}>{bundle.name}</p>
+          {bundle.description && <p style={{ fontSize: 11, color: 'var(--muted)', marginTop: 2 }}>{bundle.description}</p>}
+        </div>
+        <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 18, color: 'var(--blue)', flexShrink: 0, marginLeft: 8 }}>
+          ${bundle.price?.toLocaleString('es-MX')}
+        </span>
+      </div>
+      {names && <p style={{ fontSize: 10, color: 'var(--muted)', fontStyle: 'italic', marginBottom: 8 }}>{names}</p>}
+      <button
+        onClick={handle}
+        style={{
+          width: '100%', padding: '10px', borderRadius: 10, border: 'none', cursor: 'pointer',
+          background: added ? '#10b981' : 'var(--grad)', color: '#fff',
+          fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 13, transition: 'all 0.3s',
+        }}
+      >{added ? '✓ Agregado al carrito' : 'Comprar bundle →'}</button>
     </div>
   )
 }

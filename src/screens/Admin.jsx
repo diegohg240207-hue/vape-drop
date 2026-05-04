@@ -10,18 +10,20 @@ import Input  from '../components/ui/Input'
 
 const EMPTY_PRODUCT = { name:'', brand:'', flavor:'', puffs:'', price:'', stock:'', image_url:'', category:'', active:true }
 
-const STATUS_MAP = {
-  pending:        { label:'Nuevo',          color:'gray'   },
-  processing:     { label:'En Proceso',     color:'purple' },
-  drop_realizado: { label:'Drop Realizado', color:'blue'   },
-  shipped:        { label:'Enviado',        color:'blue'   },
-  delivered:      { label:'Entregado',      color:'green'  },
-  cancelled:      { label:'Cancelado',      color:'red'    },
-}
-const STATUS_OPTS = Object.keys(STATUS_MAP)
+const STATUS_COLORS = { nuevo:'#8b5cf6', en_proceso:'#06b6ff', drop_realizado:'#f59e0b', confirmado:'#10b981', entregado:'#22c55e' }
+const STATUS_LABELS = { nuevo:'Nuevo', en_proceso:'En proceso', drop_realizado:'Drop realizado', confirmado:'Confirmado', entregado:'Entregado' }
+const STATUS_OPTS   = ['nuevo','en_proceso','drop_realizado','confirmado','entregado']
+const STATUS_CYCLE_NORMAL = { nuevo:'en_proceso', en_proceso:'entregado', entregado:'nuevo' }
+const STATUS_CYCLE_DROP   = { nuevo:'en_proceso', en_proceso:'drop_realizado', drop_realizado:'confirmado', confirmado:'entregado', entregado:'nuevo' }
 
 const DELIVERY_MAP = { delivery:'🚚 Domicilio', drop:'📦 Drop' }
 const PAYMENT_MAP  = { tarjeta:'💳 Tarjeta', transferencia:'🏦 Transferencia', efectivo:'💵 Efectivo' }
+
+const StatusBadge = ({ status }) => {
+  const c = STATUS_COLORS[status] || '#8b5cf6'
+  const l = STATUS_LABELS[status] || status
+  return <span style={{ background:`${c}22`, color:c, border:`1px solid ${c}44`, borderRadius:20, padding:'3px 10px', fontSize:11, fontWeight:600, letterSpacing:0.5, textTransform:'uppercase', whiteSpace:'nowrap' }}>{l}</span>
+}
 
 function ProductForm({ initial, onSave, onCancel, saving }) {
   const [form, setForm] = useState(initial)
@@ -171,24 +173,30 @@ export default function Admin() {
   const tdS = { padding:'.55rem 1rem', fontSize:'13px' }
 
   return (
-    <div style={{ minHeight:'100dvh', background:'var(--bg)' }}>
+    <div style={{ minHeight:'100dvh', background:'var(--bg)', maxWidth:480, margin:'0 auto' }}>
       {/* Topbar */}
-      <div style={{ background:'var(--bg2)', borderBottom:'1px solid var(--border)', padding:'.9rem 2rem', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-        <div style={{ display:'flex', alignItems:'center', gap:'.6rem' }}>
-          <span style={{ width:30, height:30, borderRadius:8, background:'linear-gradient(135deg,var(--purple),var(--blue))', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'12px', fontWeight:800, color:'#fff' }}>VD</span>
-          <span style={{ fontFamily:"'Space Grotesk'", fontWeight:700, fontSize:'.95rem' }}>VAPE DROP — Admin</span>
+      <div style={{ background:'var(--surface)', borderBottom:'1px solid var(--border)', padding:'12px 20px', display:'flex', alignItems:'center', justifyContent:'space-between', position:'sticky', top:0, zIndex:50 }}>
+        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+          <span style={{ width:28, height:28, borderRadius:8, background:'var(--grad)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, fontWeight:800, color:'#fff', flexShrink:0 }}>VD</span>
+          <span style={{ fontFamily:"'Space Grotesk'", fontWeight:700, fontSize:14 }}>VAPE DROP Admin</span>
         </div>
-        <a href="/home" style={{ fontSize:'13px', color:'var(--text-muted)' }}>Ver tienda</a>
+        <a href="/home" style={{ fontSize:12, color:'var(--muted)', textDecoration:'none' }}>Ver tienda</a>
       </div>
 
-      <div style={{ padding:'2rem', maxWidth:1300, margin:'0 auto' }}>
-        {/* Tabs */}
-        <div style={{ display:'flex', borderBottom:'1px solid var(--border)', marginBottom:'1.5rem', gap:'.25rem' }}>
-          <button style={tabS('products')}  onClick={()=>setTab('products')}>Productos ({adminProds.length})</button>
-          <button style={tabS('orders')}    onClick={()=>setTab('orders')}>Ordenes ({orders.length})</button>
-          <button style={tabS('bundles')}   onClick={()=>setTab('bundles')}>Bundles ({bundles.length})</button>
-          <button style={tabS('config')}    onClick={()=>setTab('config')}>Configuracion</button>
-        </div>
+      {/* Tabs */}
+      <div style={{ display:'flex', gap:6, padding:'12px 20px 0', borderBottom:'1px solid var(--border)', overflowX:'auto', scrollbarWidth:'none' }}>
+        {[['products',`📦 Productos`],['orders',`🚚 Pedidos (${orders.length})`],['bundles',`🏷 Bundles`],['config','⚙️ Config']].map(([id,label])=>(
+          <button key={id} onClick={()=>setTab(id)} style={{
+            padding:'6px 14px', borderRadius:20, fontSize:12, fontWeight:600, whiteSpace:'nowrap', cursor:'pointer', transition:'all 0.2s', border:'none',
+            background: tab===id ? 'var(--grad)' : 'var(--card)',
+            color: tab===id ? '#fff' : 'var(--muted)',
+            ...(tab!==id && { border:'1px solid var(--border)' }),
+            marginBottom:12,
+          }}>{label}</button>
+        ))}
+      </div>
+
+      <div style={{ padding:'16px 20px 88px' }}>
 
         {/* PRODUCTS TAB */}
         {tab === 'products' && (
@@ -232,36 +240,48 @@ export default function Admin() {
 
         {/* ORDERS TAB */}
         {tab === 'orders' && (
-          <div style={{ background:'var(--bg2)', border:'1px solid var(--border)', borderRadius:'var(--radius-lg)', overflow:'auto' }}>
-            <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'13px' }}>
-              <thead><tr style={{ borderBottom:'1px solid var(--border)' }}>
-                {['ID','Fecha','Cliente','Entrega','Pago','Total','Estado'].map(h=><th key={h} style={thS}>{h}</th>)}
-              </tr></thead>
-              <tbody>
-                {orders.map(o=>(
-                  <tr key={o.id} style={{ borderBottom:'1px solid var(--border)', transition:'background var(--transition)' }}
-                    onMouseEnter={e=>e.currentTarget.style.background='var(--bg3)'}
-                    onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
-                    <td style={{...tdS,fontFamily:"'Space Grotesk'",fontSize:'11px',color:'var(--text-muted)'}}>{o.id?.slice(0,8).toUpperCase()}</td>
-                    <td style={{...tdS,color:'var(--text-muted)',whiteSpace:'nowrap'}}>{new Date(o.created_at).toLocaleDateString('es-MX')}</td>
-                    <td style={tdS}>
-                      <div style={{fontWeight:600}}>{o.customer_name}</div>
-                      <div style={{fontSize:'11px',color:'var(--text-muted)'}}>{o.customer_email}</div>
-                    </td>
-                    <td style={tdS}>{DELIVERY_MAP[o.delivery_type] ?? '🚚 Domicilio'}</td>
-                    <td style={tdS}>{PAYMENT_MAP[o.payment_method] ?? o.payment_method}</td>
-                    <td style={{...tdS,fontWeight:700}}>${o.total?.toLocaleString('es-MX')}</td>
-                    <td style={tdS}>
-                      <select value={o.status} onChange={e=>updateStatus(o.id,e.target.value)}
-                        style={{ background:'var(--bg3)', border:'1px solid var(--border)', borderRadius:6, padding:'5px 8px', color:'var(--text)', fontSize:'12px', cursor:'pointer' }}>
-                        {STATUS_OPTS.map(s=><option key={s} value={s}>{STATUS_MAP[s]?.label ?? s}</option>)}
-                      </select>
-                    </td>
-                  </tr>
-                ))}
-                {orders.length===0&&<tr><td colSpan={7} style={{padding:'3rem',textAlign:'center',color:'var(--text-muted)'}}>Sin ordenes</td></tr>}
-              </tbody>
-            </table>
+          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+            {orders.length === 0 && (
+              <div style={{ textAlign:'center', padding:'3rem', color:'var(--text-muted)', background:'var(--bg2)', borderRadius:'var(--radius-lg)', border:'1px solid var(--border)' }}>Sin órdenes</div>
+            )}
+            {orders.map(o => {
+              const isDrop = o.delivery_type === 'drop'
+              const cycle = isDrop ? STATUS_CYCLE_DROP : STATUS_CYCLE_NORMAL
+              const nextStatus = cycle[o.status]
+              return (
+                <div key={o.id} style={{ background:'var(--bg2)', border:'1px solid var(--border)', borderRadius:14, padding:14, position:'relative' }}>
+                  {isDrop && (
+                    <span style={{ position:'absolute', top:10, right:10, background:'rgba(139,92,246,0.12)', border:'1px solid rgba(139,92,246,0.25)', borderRadius:6, padding:'2px 8px', fontSize:9, color:'#a78bfa', textTransform:'uppercase', fontWeight:700 }}>DROP ANÓNIMO</span>
+                  )}
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:8 }}>
+                    <div>
+                      <p style={{ fontFamily:"'Space Grotesk'", fontWeight:700, fontSize:13, color:'var(--purple)' }}>{o.id?.slice(0,8).toUpperCase()}</p>
+                      <p style={{ fontSize:10, color:'var(--text-muted)', marginTop:2 }}>
+                        {new Date(o.created_at).toLocaleDateString('es-MX')} · {o.customer_name}
+                      </p>
+                      {isDrop && o.customer_phone && (
+                        <p style={{ fontSize:10, color:'#25d366', marginTop:2 }}>📱 +52{o.customer_phone}</p>
+                      )}
+                    </div>
+                    <div style={{ textAlign:'right', flexShrink:0 }}>
+                      <p style={{ fontFamily:"'Space Grotesk'", fontWeight:800, fontSize:14, color:'var(--blue)' }}>${o.total?.toLocaleString('es-MX')}</p>
+                      <p style={{ fontSize:10, color:'var(--text-muted)', marginTop:2 }}>{DELIVERY_MAP[o.delivery_type]||'🚚'} · {PAYMENT_MAP[o.payment_method]||o.payment_method}</p>
+                    </div>
+                  </div>
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', gap:8, flexWrap:'wrap' }}>
+                    <StatusBadge status={o.status} />
+                    <div style={{ display:'flex', gap:6 }}>
+                      {nextStatus && (
+                        <button
+                          onClick={() => updateStatus(o.id, nextStatus)}
+                          style={{ padding:'5px 12px', borderRadius:8, background:'var(--bg3)', border:'1px solid var(--border)', color:'var(--text)', fontSize:11, fontWeight:600, cursor:'pointer' }}
+                        >→ {STATUS_LABELS[nextStatus]}</button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         )}
 

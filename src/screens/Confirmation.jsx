@@ -1,57 +1,87 @@
-import { useParams, Link } from 'react-router-dom'
-import Button from '../components/ui/Button'
+import { Link, useParams } from 'react-router-dom'
+import { useOrder } from '../hooks/useOrders'
+
+const STATUS_COLORS = { nuevo:'#8b5cf6', en_proceso:'#06b6ff', drop_realizado:'#f59e0b', confirmado:'#10b981', entregado:'#22c55e' }
+const STATUS_LABELS = { nuevo:'Nuevo', en_proceso:'En proceso', drop_realizado:'Drop realizado', confirmado:'Confirmado', entregado:'Entregado' }
 
 export default function Confirmation() {
   const { orderId } = useParams()
-  const shortId = orderId?.slice(0, 8).toUpperCase()
+  const { order, loading } = useOrder(orderId)
+  const code = orderId?.slice(-6).toUpperCase() || 'XXXXXX'
+  const statusColor = STATUS_COLORS[order?.status] || '#8b5cf6'
+  const statusLabel = STATUS_LABELS[order?.status] || 'Nuevo'
 
   return (
     <div style={{
-      minHeight: 'calc(100dvh - 64px)',
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      padding: '2rem 1.25rem', textAlign: 'center',
+      minHeight: 'calc(100dvh - 90px)', display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+      padding: '24px 20px 88px', position: 'relative',
     }}>
-      <div style={{ position: 'fixed', inset: 0, background: 'radial-gradient(ellipse 60% 60% at 50% 50%, rgba(16,185,129,0.08) 0%, transparent 70%)', pointerEvents: 'none' }} />
-      <div style={{ position: 'relative', zIndex: 1, maxWidth: 480, width: '100%' }}>
-        {/* Icon */}
-        <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(34,197,94,.12)', border: '1px solid rgba(34,197,94,.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', margin: '0 auto 1.5rem' }}>
-          ✓
-        </div>
-        <h1 style={{ fontSize: 'clamp(1.5rem,4vw,2.25rem)', fontWeight: 800, marginBottom: '.75rem' }}>
-          ¡Pedido confirmado!
-        </h1>
-        <p style={{ color: 'var(--text-muted)', fontSize: '1rem', marginBottom: '1.75rem', lineHeight: 1.6 }}>
-          Tu pedido fue recibido. Te contactaremos pronto con los detalles de entrega.
-        </p>
+      <div style={{ position: 'fixed', inset: 0, background: 'radial-gradient(ellipse 60% 60% at 50% 50%, rgba(16,185,129,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
-        {/* Order ID */}
-        <div style={{ background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '1.25rem 1.5rem', marginBottom: '1.75rem' }}>
-          <p style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: '.4rem' }}>Número de pedido</p>
-          <p style={{ fontFamily: "'Space Grotesk'", fontSize: '1.5rem', fontWeight: 800, letterSpacing: '.06em', background: 'linear-gradient(135deg,var(--purple-l),var(--blue))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            #{shortId}
-          </p>
-        </div>
-
-        {/* Steps */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '.6rem', marginBottom: '2rem', textAlign: 'left' }}>
-          {[
-            ['✅', 'Pedido recibido'],
-            ['🔄', 'En proceso de preparación'],
-            ['📦', 'Enviado / Drop listo'],
-            ['🎉', 'Entregado'],
-          ].map(([icon, text], i) => (
-            <div key={i} style={{ display: 'flex', gap: '.75rem', alignItems: 'center', padding: '.6rem .85rem', background: i === 0 ? 'rgba(34,197,94,.08)' : 'var(--bg2)', borderRadius: 'var(--radius)', border: `1px solid ${i === 0 ? 'rgba(34,197,94,.2)' : 'var(--border)'}` }}>
-              <span>{icon}</span>
-              <span style={{ fontSize: '13px', color: i === 0 ? '#4ade80' : 'var(--text-muted)', fontWeight: i === 0 ? 600 : 400 }}>{text}</span>
-            </div>
-          ))}
-        </div>
-
-        <div style={{ display: 'flex', gap: '.85rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link to="/catalog"><Button variant="primary">Seguir comprando</Button></Link>
-          <Link to="/home"><Button variant="ghost">Ir al inicio</Button></Link>
-        </div>
+      {/* Checkmark */}
+      <div style={{
+        width: 90, height: 90, borderRadius: '50%',
+        background: 'rgba(16,185,129,0.12)', border: '2px solid rgba(16,185,129,0.4)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        marginBottom: 24, animation: 'glow 2s ease-in-out infinite', position: 'relative', zIndex: 1,
+      }}>
+        <svg width="44" height="44" viewBox="0 0 44 44" fill="none" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="22" cy="22" r="20" opacity="0.3"/>
+          <path d="M12 22l8 8 12-14" strokeDasharray="50" style={{ animation: 'checkmark 0.6s ease 0.2s both' }}/>
+        </svg>
       </div>
+
+      <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 26, animation: 'fadeSlideUp 0.4s ease 0.3s both', opacity: 0, position: 'relative', zIndex: 1 }}>
+        Pedido confirmado
+      </h1>
+      <p style={{ fontSize: 13, color: 'var(--muted)', maxWidth: 280, margin: '8px auto 24px', lineHeight: 1.6, animation: 'fadeSlideUp 0.4s ease 0.4s both', opacity: 0, position: 'relative', zIndex: 1 }}>
+        Tu pedido está siendo preparado para entrega discreta
+      </p>
+
+      {/* Order card */}
+      <div style={{
+        background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 14, padding: 18,
+        width: '100%', maxWidth: 320, marginBottom: 20, zIndex: 1, position: 'relative',
+        animation: 'fadeSlideUp 0.4s ease 0.5s both', opacity: 0,
+      }}>
+        {loading ? (
+          <div style={{ height: 80, background: 'var(--surface)', borderRadius: 8, opacity: 0.4, animation: 'pulse 1.5s infinite' }} />
+        ) : (
+          <>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <p style={{ fontSize: 10, color: 'var(--muted)', marginBottom: 2 }}>Número de pedido</p>
+                <p style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: 14, color: 'var(--purple)' }}>
+                  {(order?.id || orderId)?.slice(0, 8).toUpperCase()}
+                </p>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ fontSize: 10, color: 'var(--muted)', marginBottom: 2 }}>Estado</p>
+                <span style={{ background: `${statusColor}22`, color: statusColor, border: `1px solid ${statusColor}44`, borderRadius: 20, padding: '3px 10px', fontSize: 11, fontWeight: 600, textTransform: 'uppercase' }}>
+                  {statusLabel}
+                </span>
+              </div>
+            </div>
+            <div style={{ height: 1, background: 'var(--border)', margin: '12px 0' }} />
+            <p style={{ fontSize: 10, color: 'var(--muted)', marginBottom: 6 }}>Código de entrega</p>
+            <p className="grad-text" style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: 24, letterSpacing: 4, textAlign: 'center' }}>{code}</p>
+            <p style={{ fontSize: 10, color: 'var(--muted)', marginTop: 6 }}>Muestra este código al recibir</p>
+          </>
+        )}
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', marginBottom: 24, zIndex: 1, position: 'relative' }}>
+        <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--success)', display: 'block', animation: 'pulse 1.5s infinite' }} />
+        <span style={{ fontSize: 12, color: 'var(--muted)' }}>Entrega estimada en 25–45 minutos</span>
+      </div>
+
+      <Link to="/home" style={{
+        background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 14,
+        padding: '12px 28px', fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 13,
+        textDecoration: 'none', color: 'var(--text)', zIndex: 1, position: 'relative',
+        animation: 'fadeSlideUp 0.4s ease 0.7s both', opacity: 0, display: 'inline-block',
+      }}>Volver al inicio</Link>
     </div>
   )
 }
