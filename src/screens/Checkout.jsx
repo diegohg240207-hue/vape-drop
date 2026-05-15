@@ -33,14 +33,17 @@ export default function Checkout() {
 
   const validate = () => {
     const e = {}
-    if (!form.name.trim()) e.name = 'Requerido'
-    if (!form.email.includes('@')) e.email = 'Email inválido'
+    // Teléfono: siempre requerido
     if (form.phone.replace(/\D/g, '').length < 8) e.phone = 'Mínimo 8 dígitos'
+    // Email: validar solo si está lleno
+    if (form.email.trim() && !form.email.includes('@')) e.email = 'Email inválido'
+    // Campos por tipo de entrega
     if (deliveryType === 'delivery') {
       if (!form.address.trim()) e.address = 'Requerido'
     } else {
       if (!dropPointId) { setPayErr('Selecciona un punto de Drop'); return null }
     }
+    // Pago
     if (paymentMethod === 'tarjeta') {
       if (form.cardNum.replace(/\s/g, '').length < 16) e.cardNum = '16 dígitos requeridos'
       if (!form.cardExp) e.cardExp = 'Requerido'
@@ -132,8 +135,6 @@ export default function Checkout() {
                 <p key={i} style={{ fontSize: 11, color: '#9090c0', lineHeight: 1.8 }}>{t}</p>
               ))}
             </div>
-            <Input label="📱 WhatsApp (10 dígitos) *" type="tel" placeholder="5512345678" value={form.phone} onChange={e => set('phone', e.target.value.replace(/\D/g, '').slice(0, 10))} error={errors.phone} />
-            <p style={{ fontSize: 10, color: 'var(--muted)', marginTop: 4, marginBottom: 12 }}>10 dígitos — ej. 5512345678</p>
             <p style={sLabel}>Punto de entrega</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {dropPoints.length === 0
@@ -164,11 +165,23 @@ export default function Checkout() {
         <div style={card}>
           <p style={sLabel}>Datos de contacto</p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {deliveryType === 'drop' && (
+              <div style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: 10, padding: '10px 12px' }}>
+                <p style={{ fontSize: 11, color: '#c4b5fd', lineHeight: 1.7 }}>📱 Solo necesitamos tu número para coordinar la entrega y enviar evidencia del drop.</p>
+              </div>
+            )}
+            <Input
+              label={deliveryType === 'drop' ? '📱 WhatsApp (requerido)' : '📱 Teléfono / WhatsApp'}
+              type="tel"
+              placeholder={deliveryType === 'drop' ? '5512345678' : '+52 55 1234 5678'}
+              value={form.phone}
+              onChange={e => set('phone', deliveryType === 'drop' ? e.target.value.replace(/\D/g, '').slice(0, 10) : e.target.value)}
+              error={errors.phone}
+            />
+            <div style={{ height: 1, background: 'var(--border)', margin: '2px 0' }} />
+            <p style={{ fontSize: 10, color: 'var(--muted)', letterSpacing: '0.5px', textTransform: 'uppercase' }}>Opcionales</p>
             <Input label="Nombre completo" placeholder="Juan Pérez" value={form.name} onChange={e => set('name', e.target.value)} error={errors.name} />
             <Input label="Email" type="email" placeholder="juan@email.com" value={form.email} onChange={e => set('email', e.target.value)} error={errors.email} />
-            {deliveryType === 'delivery' && (
-              <Input label="Teléfono" type="tel" placeholder="+52 55 1234 5678" value={form.phone} onChange={e => set('phone', e.target.value)} error={errors.phone} />
-            )}
           </div>
         </div>
 

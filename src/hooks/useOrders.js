@@ -6,9 +6,18 @@ export function useOrders() {
   const [error, setError]     = useState(null)
 
   async function createOrder({ customer, items, total, deliveryType, paymentMethod, shippingCost, dropPointId }) {
-    // Backend validation: drop => no efectivo
+    // Backend validations
     if (deliveryType === 'drop' && paymentMethod === 'efectivo') {
       return { order: null, error: 'El pago en efectivo no está disponible para Drop Anónimo.' }
+    }
+    if (!customer.phone || customer.phone.replace(/\D/g, '').length < 8) {
+      return { order: null, error: 'El teléfono / WhatsApp es requerido.' }
+    }
+    if (deliveryType === 'delivery' && !customer.address?.trim()) {
+      return { order: null, error: 'La dirección de entrega es requerida.' }
+    }
+    if (deliveryType === 'drop' && !dropPointId) {
+      return { order: null, error: 'Selecciona un punto de Drop.' }
     }
     setLoading(true); setError(null)
     try {
